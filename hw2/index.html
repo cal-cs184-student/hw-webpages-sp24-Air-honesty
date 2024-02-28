@@ -1,7 +1,290 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 2 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    background-color: white;
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  kbd {
+    color: #121212;
+  }
+</style>
+<title>CS 184 Mesh Edit</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
+</head>
+
+
+<body>
+<h1 align="middle">https://cal-cs184-student.github.io/hw-webpages-sp24-Air-honesty/</h1>
+<h1 align="middle">CS 184: Computer Graphics and Imaging</h1>
+<h1 align="middle">Project 2: Mesh Edit</h1>
+<h2 align="middle">Yifeng Zhang &Sihua Ren
+</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>
+  In this project, our objective was to implement the De Casteljau Algorithm for the creation and manipulation of Bezier Curves/Surfaces, alongside basic mesh operations such as edge-flipping, edge-splitting, and upsampling within a Mesh Editor, utilizing the halfedge data structure for these purposes. The successful integration of these functionalities is crucial for the manipulation and processing of geometric data in the field of computer graphics. This endeavor has deepened my comprehension of Bezier curves/surfaces and honed my skills in navigating meshes through the halfedge data structure. The visuals and outcomes presented in this report showcase the wide range of geometric forms and processing techniques achievable with the implemented features.
+</p>
+<br>
+
+
+<h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+<h3 align="middle">Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
+
+<p>
+  The De Casteljau Algorithm serves as a computational method for determining a point's position on a Bezier Curve, parameterized by a scalar t that ranges between 0 and 1. When provided with n control points, this algorithm facilitates the calculation of points on the Bezier curve through a recursive methodology that involves linear interpolations among these control points, evaluating each segment at the fractional length t. This recursive operation is mathematically delineated as a process in which the initial set of coordinate points undergoes reduction to a set of length n−1 via linear interpolation. In the context of implementation, a subroutine named BezierCurve::EvaluateStep() is incorporated within the BezierCurve class. This function is designed to receive a list of points and the parameter t, conducting a single iteration of the recursion as previously defined, thereby producing a list of points that have undergone linear interpolation.This elementary function subsequently serves as a foundational component for the comprehensive definition of Bezier Curves and Surfaces. Accompanying this text is a series of images that sequentially illustrate the De Casteljau algorithm's iterative updates on a list of 6 control points for a specified value of t, showcasing the algorithm's progression towards convergence on a singular point on the Bezier curve. The authentic Bezier Curve is depicted in green for referential purposes. The iterations, numbered 1 through 5, display linear interpolations represented by blue line segments. The culmination of the algorithm's process, marked by a red square in the fifth image, demonstrates precise alignment with the green reference curve, affirming the algorithm's precision. The concluding pair of images depict the application of the algorithm to a set of marginally modified control points and an alternate t value, illustrating its functionality under varied conditions.
+</p>
+<br>
+
+<div align="middle">
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="output/a1/im1.png" align="middle" width="300px"/>
+        <figcaption>Iteration 0 </figcaption>
+      </td>
+      <td>
+        <img src="output/a1/im2.png" align="middle" width="300px"/>
+        <figcaption>Iteration 1</figcaption>
+      </td>
+      <td>
+        <img src="output/a1/im3.png" align="middle" width="300px"/>
+        <figcaption>Iteration 2</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr align="center">
+      <td>
+        <img src="output/a1/im4.png" align="middle" width="300px"/>
+        <figcaption>Iteration 3</figcaption>
+      </td>
+      <td>
+        <img src="output/a1/im5.png" align="middle" width="300px"/>
+        <figcaption>Iteration 4</figcaption>
+      </td>
+      <td>
+        <img src="output/a1/im6.png" align="middle" width="300px"/>
+        <figcaption>Iteration 5</figcaption>
+      </td>
+    </tr>
+    <br>
+  </table>
+</div>
+<br>
+
+<div align="middle">
+  <table style="width=100%">
+      <tr>
+          <td>
+              <img src="output/a1/im7.png" align="middle" width="300px" />
+              <figcaption align="middle">Moving points with new t value</figcaption>
+          </td>
+          <td>
+              <img src="output/a1/im8.png" align="middle" width="300px" />
+              <figcaption align="middle">Moving points with new t value</figcaption>
+          </td>
+      </tr>
+  </table>
+</div>
+
+
+<h3 align="middle">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
+
+<p>
+  The De Casteljau Algorithm, when applied in one dimension, can be seamlessly extended to facilitate the creation of 2D Bezier surfaces. For this extension to occur, it's essential that the surface can be conceptualized as a collection of 1D Bezier curves. Imagine we have m Bezier curves situated in 3D space, each curve defined by n control points and parameterized by a scalar u. These curves enable the definition of a Bezier surface as the collection of points generated by a 'sliding' Bezier curve g_u(v), which is parameterized by v and constructed through the control points determined for any given value of u. As u varies, we obtain a two-dimensional function, g(u,v), representing the surface. To compute a point g(u,v) on such a surface with the De Casteljau Algorithm, we employ a function that accepts a 2D vector of mxn control points along with the parametric coordinates u,v. The process begins with the execution of the 1D De Casteljau algorithm along the rows of this 2D vector, yielding m Bezier curves evaluated at u. Subsequently, these m resultant points serve as the basis for evaluating the 'sliding' Bezier curve at v using the De Casteljau Algorithm. The accompanying image illustrates the capability of this method to generate complex geometries, including hard edges, beveled surfaces, and discontinuities, through the assembly of Bezier surface patches.
+</p>
+<br>
+
+<div align="middle">
+  <img src="output/a2/im1.png" align="middle" width="400px" />
+  <figcaption align="middle">Bezier Surfaces of a teapot</figcaption>
+</div>
+
+
+
+<h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+<h3 align="middle">Part 3: Area-Weighted Vertex Normals</h3>
+
+<p>
+  In my approach to calculating vertex normals, I leveraged the halfedge data structure alongside the characteristics of vector cross-products. To compute a vertex's normal within the mesh, I navigated through the faces adjacent to the vertex, gathering the normal vectors of each face, and applied a weighting based on the area of the respective faces. This process began with identifying the halfedge linked to the vertex in question. As every halfedge carries a reference to its encompassing face, it was straightforward to iterate over all outgoing halfedges from the given vertex. To move from one outgoing halfedge to the next, I used a combination of the twin() and next() functions. In the halfedge mesh framework, face elements inherently possess their normal vectors, making them readily available. However, the challenge lay in calculating the face's area to apply the correct weighting to its normal. Utilizing the property that the cross-product of two vectors yields a magnitude equivalent to twice the area of the triangle formed by these vectors, and given that each face of the mesh forms a triangle, I was able to calculate the weighting for each face's normal by constructing two temporary 3D vectors from the vertices of the face and performing a cross-product. Interestingly, the vector resulting from the cross-product is inherently perpendicular to the plane defined by the original vectors, eliminating the need to directly access the normal from the face element. To finalize the vertex normal, I aggregated the normals of the surrounding faces, weighting each by the proportional area of the face. The comparison presented below showcases the shading enhancements achieved through the application of vertex normals.
+</p>
+<br>
+
+<div align="middle">
+  <table style="width=100%">
+      <tr>
+          <td>
+              <img src="output/a3/im1.png" align="middle" width="300px" />
+              <figcaption align="middle">Before flat</figcaption>
+          </td>
+          <td>
+              <img src="output/a3/im2.png" align="middle" width="300px" />
+              <figcaption align="middle">After flat</figcaption>
+          </td>
+      </tr>
+  </table>
+</div>
+
+
+<h3 align="middle">Part 4: Edge Flip</h3>
+
+
+<p>
+  The process of executing an edge-flip operation on the mesh required meticulous manipulation of pointers. Initially, I utilized pen and paper to meticulously list down the necessary updates for each instance variable associated with the elements involved in the edge-flip. This preliminary step served as a visual aid, clarifying the precise pointer adjustments needed. Prior to the operation, I verified that the edge targeted for flipping was not situated on the boundary of the mesh. Subsequently, I delineated temporary variables for each pertinent mesh element by employing traversal functions specific to the halfedge mesh structure. Armed with these variables, I then applied the reassignments as outlined in my preparatory notes. This careful approach paid off, as I encountered no bugs during the implementation. The accompanying example images illustrate that the edge-flip operation inherently modifies the mesh's topology. Intriguingly, it also reveals that the geometry of the mesh can undergo changes, particularly when the operation is applied to an edge linking two faces that are not coplanar. This observation highlights how the edge-flip can influence the mesh's geometric configuration in certain scenarios.
+</p>
+<br>
+
+<div align="middle">
+  <table style="width=100%">
+      <tr>
+          <td>
+              <img src="output/a4/im1.png" align="middle" width="300px" />
+              <figcaption align="middle">Before flip</figcaption>
+          </td>
+          <td>
+              <img src="output/a4/im2.png" align="middle" width="300px" />
+              <figcaption align="middle">After flip</figcaption>
+          </td>
+      </tr>
+  </table>
+</div>
+
+<h3 align="middle">Part 5: Edge Split</h3>
+
+
+<p>
+  For the implementation of the edge split operation, my methodology mirrored that of the edge-flip operation. Nonetheless, this procedure necessitated the addition of one new vertex, three new edges, and six new halfedges to the mesh. Following the enumeration of pointer reassignments for each element within the mesh, I proceeded to determine the position of the new vertex, situating it at the midpoint of the designated edge. Furthermore, I marked the isNew attribute as true for all newly introduced edges and vertices—an oversight in this step previously resulted in significant debugging efforts during my work on the Loop subdivision algorithm.
+</p>
+<br>
+
+<div align="middle">
+  <img src="output/a5/im1.png" align="middle" width="400px" />
+  <figcaption align="middle">Original</figcaption>
+</div>
+<div align="middle">
+  <table style="width=100%">
+      <tr>
+          <td>
+              <img src="output/a5/im2.png" align="middle" width="300px" />
+              <figcaption align="middle">After edge splits </figcaption>
+          </td>
+          <td>
+              <img src="output/a5/im3.png" align="middle" width="300px" />
+              <figcaption align="middle">After edge splits </figcaption>
+          </td>
+      </tr>
+  </table>
+</div>
+<div align="middle">
+  <table style="width=100%">
+      <tr>
+          <td>
+              <img src="output/a5/im4.png" align="middle" width="300px" />
+              <figcaption align="middle">After both edge splits and edge flips</figcaption>
+          </td>
+          <td>
+              <img src="output/a5/im5.png" align="middle" width="300px" />
+              <figcaption align="middle">After both edge splits and edge flips</figcaption>
+          </td>
+      </tr>
+  </table>
+</div>
+
+
+
+<h3 align="middle">Part 6: Loop Subdivision for Mesh Upsampling</h3>
+
+<p>
+  In accordance with the guidelines provided in the project specifications, I initiated the process by pre-calculating the weighted positions for both existing and forthcoming vertices within the mesh under consideration. For vertices already present, their new positions were recorded within their own newPosition attribute. The challenge arose when addressing the locations for vertices yet to be introduced, as these entities were not formed at this stage. To circumvent this issue, the newPosition attribute of the pre-existing edges was utilized to store these future vertex locations, ensuring their accessibility post-edge-splitting, given their adjacency to the newly created vertices. Following this preparatory step, I embarked on iterating over all pre-existing edges to divide them through the edge-split operation. The encounter with infinite loops, a consequence of adding new edges to the mesh, was eventually resolved by establishing precise conditions for edge division, specifically, verifying that the terminal vertices of an edge were not newly added.
+</p>
+<br>
+
+<p>
+  The realization that the 4-1 triangle subdivision could be actualized by judiciously choosing edges to flip post-splitting every edge in the mesh required some contemplation. Upon grasping the prerequisites for an edge flip, I refined my edge-split subroutine to exclusively flag the new edges, those that halved the original edges, as isNew. The final step involved reassigning each vertex to its pre-determined location identified at the outset.
+</p>
+<br>
+<p>
+  Loop subdivision, aimed at achieving a mesh with uniform vertex distribution, inherently softens sharp edges, which are analogous to high-frequency 3D details within the mesh. This process of uniformizing vertex spacing effectively establishes a Nyquist sampling frequency across the mesh, leading to the bevelling of sharp contours and typically manifesting the most significant quadratic discrepancy following the initial iteration. The depicted transformations of a cube illustrate this phenomenon, showcasing the smoothing effect engendered by the loop subdivision process.
+</p>
+<br>
+<p>
+  And the first row is an asymmetric cube, and the second row is a symmetric cube.
+</p>
+<br>
+
+<div align="middle">
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="output/a6/im1.png" align="middle" width="200px"/>
+        <figcaption>Asymmetrical cube </figcaption>
+      </td>
+      <td>
+        <img src="output/a6/im2.png" align="middle" width="200px"/>
+        <figcaption>Upsample1 </figcaption>
+      </td>
+      <td>
+        <img src="output/a6/im3.png" align="middle" width="200px"/>
+        <figcaption>Upsample3</figcaption>
+      </td>
+      <td>
+        <img src="output/a6/im4.png" align="middle" width="200px"/>
+        <figcaption>Upsample3</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr align="center">
+      <td>
+        <img src="output/a6/im11.png" align="middle" width="200px"/>
+        <figcaption>Symmetrical cube</figcaption>
+      </td>
+      <td>
+        <img src="output/a6/im12.png" align="middle" width="200px"/>
+        <figcaption>Upsample1</figcaption>
+      </td>
+      <td>
+        <img src="output/a6/im13.png" align="middle" width="200px"/>
+        <figcaption>Upsample2</figcaption>
+      </td>
+      <td>
+        <img src="output/a6/im14.png" align="middle" width="200px"/>
+        <figcaption>Upsample3</figcaption>
+      </td>
+    </tr>
+    <br>
+  </table>
+</div>
+<br>
+
+
+</body>
 </html>
