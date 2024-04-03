@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184/284A Final Project Proposal</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+  <nav>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><strong>Project Proposal</strong></li>
+    <li><a href="milestone.html">Milestone Report</a></li>
+    <li><a href="final.html">Final Report</a></li>
+  </ul>
+</nav>
+
+
+<h1 align="middle">CS 184/284A: Final project- Leap and Jump</h1>
+<h2 align="middle">Yifeng Zhang, Sihua Ren, Aslina Cheng, Boyuan Ma</h2>
+<p>
+    In this project, we want to use texture and Light rendering to make an interactive application based on the existing platform jumping game. In the showcase, users can control the intensity of the jump by controlling how long they click on the screen to get a higher score with beautiful animation and fetching background music.<br /><br />
+
+    <h2 align="middle">Problem Description</h2>
+</p><p>
+    In the original small game called  “tiao-yi-tiao”, it is a platform jumping game with a single color action model and geometric blocks, which was rather boring. We wanted to upgrade the game with a good visual appearance and improve the experience by texture and light rendering. The difficulties we might meet  are  Real-Time Rendering and Input Lag. Managing real-time light rendering and texture processing while ensuring the game runs smoothly can be challenging, especially on devices with limited processing power. And Minimizing the delay between user input (clicking or tapping the screen) and the application's response is crucial for a good user experience. But we are determined to present it as best we can by searching for information and trying a lot for optimization.
+
+<h2 align="middle">Goals and Deliverables</h2>
+<h3>Baseline Plan: </h3>
+<ol type=”1”>
+<li>Scene Design and Display
+<ul> 
+<li>We will construct a virtual scene using hierarchical modeling techniques, comprised of multiple virtual objects.
+<li>The virtual scene will be displayed and can represent either an indoor or outdoor environment.
+<li>The scene will include the ground as an essential element.</li>
+    </ul>
+<li>Texture Mapping</li>
+<ul> 
+<li>We plan to apply texture mapping to at least two main objects within the scene, enhancing their visual detail and realism.</li>
+</ul>
+<li>Lighting, Materials, and Shadow Effects</li>
+<ul>
+<li>To achieve realistic lighting and shadow effects, we will implement the Phong reflection model for rendering.</li>
+<li>The integration of material properties and shading will contribute to the authenticity of the scene's appearance.
+</li>
+</ul>
+<li>
+    User Interaction and Viewpoint Switching
+</li>
+<ul>
+    <li>
+        Users will be able to control and transform objects within the scene, such as moving, rotating, and scaling, using keyboard or mouse inputs.
+    </li>
+    <li>
+        We will implement camera transformations that allow for arbitrary angle viewing, providing a comprehensive exploration of the scene.
+    </li>
+</ul>
+<li>
+    Experiments and evaluation
+</li>
+<ul>
+    <li>
+        We will measure the frames per second (FPS) during interaction and scene manipulation to ensure smooth real-time performance. The target is to maintain a minimum of 30 FPS, which is considered acceptable for real-time applications.
+    </li>
+    <li>
+        For static scenes, we'll measure the time taken to render a single frame. Our goal is to keep this rendering time under a threshold that ensures a seamless user experience.
+    </li>
+</ul>
+
+</ol>
+
+<h3>Aspirational Plan</h3>
+    <p>
+        Based on the baseline,through GUI selection, we provide diverse textures and looks, making it more colorful and more fun.
+    </p>
+
+<h2 align="middle">Schedule</h2>
+<ul>
+<li>3/20 - 4/2: Project Proposal </li>
+<li>4/2: Project Proposal Due</li>
+<li>
+    4/2 - 4/7: Scene Design and Display & Texture Mapping
+</li>
+<li>4/7 - 4/12: Lighting, Materials, and Shadow Effects</li>
+<li>
+    4/12 - 4/16: User Interaction and Viewpoint Switching
+</li>
+<li>4/13 - 4/16: Project Milestone deliverables </li>
+<li>4/16: Project Milestone Due (website, video, slides)</li>
+<li>4/16  - 4/26: Integration and Experiments / Stretch Goals</li>
+<li>4/26 - 4/30: Project Final Deliverables (video, final report)</li>
+<li>4/30: Final Deliverables (video, final report)</li>
+<li>4/30 - 5/2: Project Presentation deliverables: assembly of slides, videos, practice</li>
+<li>5/2: Project Presentations (5min)</li>
+</ul>
+
+<h2 align="middle">Resources</h2>
+
+<p>According to the current literature found in our project, we hope to carry out this project according to the ideas provided by this article (<a href="https://blog.csdn.net/purers/article/details/82625110?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-82625110-blog-126935412.235^v43^control&spm=1001.2101.3001.4242.1&utm_relevant_index=3"> "csdn"</a>) and the script code of the original "tiao-yi-tiao" game.(<a href="https://github.com/yaoshanliang/weapp-jump"> "code reference"</a>)</p>
+
+<p> We hope to reuse a lot of code in the assignments into this project, because many of the deliverables of this project are based on the knowledge learned in class, and we hope to perfectly integrate the functions </p>
+
+</body>
+</html>
+
+
