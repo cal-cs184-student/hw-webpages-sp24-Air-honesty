@@ -1,7 +1,422 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">https://cal-cs184-student.github.io/hw-webpages-sp24-Air-honesty/</h1>
+<h1 align="middle">CS 184: Computer Graphics and Imaging</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Yifeng Zhang & Sihua Ren</h2>
+
+<br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>
+            The objective of this project was to construct a simulation of cloth movement that operates in real-time. To achieve this, a mass and spring system was deployed, setting up the cloth with a matrix of weights connected by springs of three different kinds for varied tensions: structural, shear, and bending. The movement of the cloth over time was then modeled through numerical integration, taking care to maintain the simulation both effective and fast to mirror a real-time process. Post the creation of the cloth model, we integrated collision detection with spherical and planar objects, followed by the incorporation of self-collision mechanics to the system. In the self-collision aspect, a hashmap was utilized to keep track of the proximities between the weights, ensuring a more efficient computational process by steering clear of a quadratic time complexity method that would result in sluggish performance.
+            To wrap up the project, we developed several GLSL shaders, which provided a visually engaging outcome. These shaders added a novel aspect to the project, presenting a programming experience that, while comparable to previous work, offered a distinctive and enjoyable shift in our routine activities.
+        </p>
+        <h2 align="middle">Part I: Masses and springs</h2>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/1-1.png" align="middle" width="480px" />
+                        <figcaption><var>Without shearing constraints</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/1-2.png" align="middle" width="480px" />
+                        <figcaption><var>Only shearing constraints</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/1-3.png" align="middle" width="480px" />
+                        <figcaption><var>All constraints</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <h2 align="middle">Part II: Simulation via numerical integration</h2>
+
+        </p><p>
+            When we set the spring constant ks=5, the drooping degree of the fabric is most significant, and the center part of it will be more concentrated when falling, and it will take on a more wavy shape as it falls. This is because the smaller the spring constant, the less tension between the fabric point masses, allowing the fabric to have more room to sag. In contrast, when the spring constant is set to ks=5000, the flexibility and shape retention of the fabric are increased, and the center of the fabric is still sagging, but it is more stable and slow than when ks=5
+            By further increasing the spring constant to ks=20000, the droopy degree of the fabric is further reduced, showing higher rigidity. When the spring constant is set to ks=100000, the fabric exhibits the highest rigidity and the least drooping degree. In this case, the fabric hardly shows any significant drooping or fluctuation, because the extremely high spring constant creates an extreme tension between the point masses, keeping the fabric almost perfectly flat between the two fixed points.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/2-k-5.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 5</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/2-k-5000.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 5000</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/2-k-20000.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 20000</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/2-k-100000.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 100000</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            When we set the density of the fabric to 1, the fabric is least under the center part between the two fixed angles, and there is hardly much movement behind the bottom anymore. This is because the lower density means that the points on the fabric are lighter, so the relative influence between the spring force and gravity is more significant, resulting in the fabric being tighter and sagging less overall. When the density is increased to 15, the cloth exhibits droop and mobility between a density of 1 and a higher density value. The point mass of the cloth is moderate, so that the gravity and the spring force achieve a relative balance between the state, resulting in the cloth in the center between the two fixed points have a moderate drooping, while maintaining a certain shape and stability. When the density is further increased to 50, the drooping phenomenon of the fabric becomes more obvious. This is because the increased density causes the weight of the mass at each point on the fabric to increase, and the influence of gravity on the fabric increases, exceeding the action of the spring force. Therefore, the central part of the fabric between the two fixed points will have a greater droop, and the movement and fluctuation behind the bottom is more obvious. Finally, when the density is increased to 100, the center droop of the fabric between the two fixed points reaches its maximum. In this case, the point mass of the fabric is extremely heavy, and the strong gravity makes the fabric sag extremely significant, almost ignoring the role of the spring force.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/2-d-1.png" align="middle" width="480px" />
+                        <figcaption><var>Density = 1</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/2-d-15.png" align="middle" width="480px" />
+                        <figcaption><var>Density = 15</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/2-d-50.png" align="middle" width="480px" />
+                        <figcaption><var>Density = 50</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/2-d-100.png" align="middle" width="480px" />
+                        <figcaption><var>Density = 100</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            Reducing the damping coefficient to 0.02% makes the fabric more volatile and takes longer to reach equilibrium because the energy dissipates slowly causing the fabric to swing back and forth. When the damping coefficient is set to 0.1%, the fluctuation of the fabric is reduced, but it is still more significant than 0.2% damping. Under the damping coefficient of 0.2%, the cloth movement is more stable and the swing is reduced. When damping is increased to 1%, the fabric falls slowly and hardly wobbles, because the high damping quickly dissipates energy and improves stability. The different Settings of the damping coefficient directly affect the dynamic behavior of the cloth, including the volatility and stability. By adjusting the damping coefficient, the swing amplitude of the cloth can be controlled and the speed of reaching the balance can be achieved.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/2-d-.002.png" align="middle" width="480px" />
+                        <figcaption><var>Damping = 0.02%</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/2-d-.01.png" align="middle" width="480px" />
+                        <figcaption><var>Damping = 0.1%</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/2-d-.02.png" align="middle" width="480px" />
+                        <figcaption><var>Damping = 0.2%</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/2-d-.1.png" align="middle" width="480px" />
+                        <figcaption><var>Damping = 1%</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/2-10.png" align="middle" width="480px" />
+                        <figcaption><var>pinned4.json</var></figcaption>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+
+        <br /><br />
+
+        <h2 align="middle">Part III: Handling collisions with other objects</h2>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/3-k-500.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 500</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/3-k-5000.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 5000</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/3-k-50000.png" align="middle" width="480px" />
+                        <figcaption><var>KS = 50000</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            As the spring constant (KS) increases, the fabric exhibits greater self-support. At low KS values, the fabric sags across the board, as if it does not work well against gravity, and the part of the fabric at the top of the sphere cannot support the rest. At higher KS values, the fabric behaves almost stiffer, as if it were the kind of fabric we imagine to look "thicker" or less flexible when it falls on a sphere. The edges are self-sustaining and do not deform too much.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/3-2.png" align="middle" width="480px" />
+                        <figcaption><var>Cloth at rest on a plane</var></figcaption>
+                    </td>
+             
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Part IV: Handling self-collisions</h2>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/4-1.png" align="middle" width="480px" />
+                        <figcaption><var>Initial </var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/4-2.png" align="middle" width="480px" />
+                        <figcaption><var>After a while </var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/4-3.png" align="middle" width="480px" />
+                        <figcaption><var>End</var></figcaption>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+
+        <br />
+        <br />
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/4-hd.png" align="middle" width="480px" />
+                        <figcaption><var>High density initial</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/4-hd1.png" align="middle" width="480px" />
+                        <figcaption><var>High density end</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/4-ld.png" align="middle" width="480px" />
+                        <figcaption><var>Low density initial</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/4-ld1.png" align="middle" width="480px" />
+                        <figcaption><var>Low density end</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            It's absolute that the cloth's reaction is markedly different when its density is altered. With an increase in density, the cloth exhibits a plethora of finer creases, resulting in multiple smaller folds upon itself. In comparison, a cloth with reduced density displays larger, more gentle waves and lacks the small wrinkles found in its denser counterpart. This distinction becomes even more pronounced when the cloth settles after movement; the high-density cloth retains a multitude of tiny folds and creases, whereas the cloth with less density settles with fewer, broader folds and significantly fewer wrinkles.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/4-hk.png" align="middle" width="480px" />
+                        <figcaption><var>High KS initial</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/4-hk1.png" align="middle" width="480px" />
+                        <figcaption><var>High KS end</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/4-lk.png" align="middle" width="480px" />
+                        <figcaption><var>Low KS initial</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/4-lk1.png" align="middle" width="480px" />
+                        <figcaption><var>Low KS end</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <br />
+
+        <p>
+            Just as the change in density mentioned earlier, adjusting our parameters has a significant impact on how the cloth behaves, specifically in the way it creases and folds. In this case, increasing the KS value leads to an outcome somewhat akin to what is observed with a cloth of lower density, where the cloth forms into broader waves rather than intricate and complex patterns. With a low KS value, the cloth tends to crumple in a more chaotic manner. This is also apparent when the cloth reaches a state of rest: cloth with a high KS value settles into a pleasing and nearly smooth state, whereas cloth with a low KS value remains tangled and disordered.
+        </p>
+
+
+
+
+
+
+
+        <h2 align="middle">Part V: Shaders</h2>
+        <h3 align="middle">Shader Overview</h3>
+
+        <p>
+            A shader program is a sophisticated type of software that is used on a graphics card to generate special visual effects, such as those affecting lighting and textures. For this project, we've chosen the GLSL shader language. Shaders are efficient because they're able to operate concurrently on the GPU, and to ensure this runs smoothly, certain shader components like uniform variables are designed to be read-only. Shaders are typically divided into two components: the vertex shader and the fragment shader. The vertex shader is responsible for altering the position of each vertex in the 3D model displayed on the screen, while the fragment shader determines the color of each individual pixel in the resulting image. For instance, you would use the vertex shader for tasks like displacement mapping, whereas a diffusion effect would be handled by the fragment shader. When these two shaders are skillfully combined, they can produce a wide array of extraordinary visual effects.
+        </p>
+
+        <h3 align="middle">Blinn-Phong Shading</h3>
+
+        <p>
+            The Blinn-Phong shading technique enhances the realism of lighting in 3D object rendering by calculating two distinct lighting elements: the specular and the diffuse components. The specular part is responsible for the shiny highlights that are visible, while the diffuse part deals with how the rest of the light interacts with the surface, either being absorbed or diffused. In this model, both the light reflection off the surface to the viewer (specular) and the light dispersion by the object (diffuse) are taken into account, and their effects are merged to determine the final color of each pixel in the render.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/5-a.png" align="middle" width="480px" />
+                        <figcaption><var>Ambient Only</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/5-d.png" align="middle" width="480px" />
+                        <figcaption><var>Diffuse only</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/5-s.png" align="middle" width="480px" />
+                        <figcaption><var>Specular only</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/5-all.png" align="middle" width="480px" />
+                        <figcaption><var>Entire Blinn-Phong model</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 align="middle">Texture Mapping</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/5-tex.png" align="middle" width="480px" />
+                        <figcaption>
+                            <var>The texture_2 result</var>
+                        </figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 align="middle">Bump & Displacement Mapping</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/5-bump.png" align="middle" width="480px" />
+                        <figcaption><var>Bump</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/5-dis.png" align="middle" width="480px" />
+                        <figcaption><var>Displacement </var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            Bump mapping and Displacement Mapping might initially appear to produce identical effects, both simulating raised areas and indentations on an object's surface. Bump mapping achieves this illusion by modifying the surface normals of the object, which gives the perception of depth and texture without altering the object's actual shape. Displacement mapping, however, actually alters the object's geometry by moving its vertices, creating genuine elevation and recesses on the surface. The distinction between these two techniques is made more apparent in the following example.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/5-bump16.png" align="middle" width="480px" />
+                        <figcaption><var>Bump -o 16 -a 16</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/5-dis128.png" align="middle" width="480px" />
+                        <figcaption><var>Displacement -o 16 -a 16</var></figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="result/5-bump128.png" align="middle" width="480px" />
+                        <figcaption><var>Bump -o 128 -a 128</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/5-dis128.png" align="middle" width="480px" />
+                        <figcaption><var>Displacement -o 128 -a 128</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            As we can see, the roughness of the sphere's mesh has no impact when it comes to Bump mapping. This is due to the fact that bump mapping is simply altering the direction of the normals on the sphere's surface, not the geometry itself. As such, the underlying structure of the sphere remains unchanged. On the other hand, the mesh's coarseness is quite significant in the case of Displacement mapping. At a lower 3D resolution, say around 16x16, there's not enough detail to modify without causing the sphere to appear blocky and misshapen. Yet, with a higher resolution, there's ample space to adjust the vertices to enhance the shape of the sphere, leading to a more realistic and appealing result.
+        </p>
+
+        <h3 align="middle">Environment-mapped Reflection</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="result/5-mirror.png" align="middle" width="480px" />
+                        <figcaption><var>Before drop</var></figcaption>
+                    </td>
+                    <td>
+                        <img src="result/5-mirror1.png" align="middle" width="480px" />
+                        <figcaption><var>After drop</var></figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+    </div></body>
 </html>
